@@ -6,7 +6,7 @@
 FROM openjdk:11-jre-slim
 
 ### Set environment variables
-ENV SONARQUBE_VERSION=9.1 \
+ENV SONARQUBE_VERSION=sonarqube-9.9.3.79811 \
     SONARQUBE_HOME=/opt/sonarqube
 
 ### Download and install SonarQube
