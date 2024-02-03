@@ -31,6 +31,38 @@ USER sonarqube
 ### Start SonarQube
 CMD ["sh", "-c", "$SONARQUBE_HOME/bin/linux-x86-64/sonar.sh"]
 ```
+Sure, here's a basic Dockerfile for building a SonarQube image:
+
+
+### This Dockerfile uses the official SonarQube image as a base and exposes the default SonarQube web port (9000).
+
+### To build and run the Docker image, follow these steps:
+
+1. Save the Dockerfile in a directory (e.g., `sonarqube-docker`).
+
+2. Open a terminal and navigate to the directory containing the Dockerfile.
+
+3. Build the Docker image using the following command:
+
+   ```bash
+   docker build -t my-sonarqube-image .
+   ```
+
+   Replace `my-sonarqube-image` with your desired image name.
+
+4. Once the image is built, you can run a container from it using the following command:
+
+   ```bash
+   docker run -d -p 9000:9000 --name sonarqube-container my-sonarqube-image
+   ```
+
+   - `-d`: Run the container in the background (detached mode).
+   - `-p 9000:9000`: Map the host machine's port 9000 to the container's port 9000.
+   - `--name sonarqube-container`: Assign a name to the container (you can choose any name).
+   - `my-sonarqube-image`: The name of the Docker image you built.
+
+Now, you should have a SonarQube container running, and you can access the SonarQube web interface by navigating to `http://localhost:9000` in your web browser.
+
 
 ### This Dockerfile does the following:
 
