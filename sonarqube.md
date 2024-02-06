@@ -14,7 +14,7 @@ RUN set -eux; \
     groupadd -r sonarqube && useradd -r -g sonarqube -d $SONARQUBE_HOME sonarqube; \
     apt-get update; \
     apt-get install -y --no-install-recommends wget unzip; \
-    wget -O /tmp/sonarqube.zip "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$SONARQUBE_VERSION.zip"; \
+    wget -O /tmp/sonarqube.zip "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$SONARQUBE_VERSION.zip"; \                            
     unzip /tmp/sonarqube.zip -d /opt; \
     mv "/opt/sonarqube-$SONARQUBE_VERSION" $SONARQUBE_HOME; \
     chown -R sonarqube:sonarqube $SONARQUBE_HOME; \
