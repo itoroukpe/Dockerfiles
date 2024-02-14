@@ -1,5 +1,6 @@
 #Example 1: (Volumes & Networks also will be created by docker compose)
 ### docker-compose.yml 
+```docker-compose
 version: '3.1'
 services:
   app:
@@ -29,3 +30,4 @@ volumes:
 networks:
   wellsfargo:
     driver: bridge![image](https://github.com/itoroukpe/Dockerfiles/assets/122684000/b90b628b-0606-4f84-b3d4-987eb28b63bd)
+```
