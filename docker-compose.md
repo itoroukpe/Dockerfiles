@@ -1,4 +1,4 @@
-#Example 1: (Volumes & Networks also will be created by docker compose)
+# Example 1: (Volumes & Networks also will be created by docker compose)
 ### docker-compose.yml 
 ```docker-compose
 version: '3.1'
