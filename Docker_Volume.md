@@ -183,7 +183,7 @@ version: '3.1'
 services:
   app:
     #replicas: 4
-    image: rondustech/myapp:6
+    image: mylandmarktech/myapp:6
     restart: always # This will be ignored if we deploy in docker swarm
     environment:
     - MONGO_DB_HOSTNAME=mongod
