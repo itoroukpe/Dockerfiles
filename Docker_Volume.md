@@ -1,6 +1,6 @@
-Docker Volumes
+# Docker Volumes
 
-Volumes:
+### Volumes:
 =======
 = java-based 
 = spring-boot
@@ -29,9 +29,11 @@ Volumes:
 Bind Mounts:
 Bind mounts may be stored anywhere on the host system. They may even be important system files or directories. Non-Docker processes on the Docker host or a Docker container can modify them at any time.
 
-# Volumes Using bind mount
+### Volumes Using bind mount
+```
 mkdir data &&
 docker run -d --name mongo -v data:/data/db  -e MONGO_INITDB_ROOT_USERNAME=devdb -e MONGO_INITDB_ROOT_PASSWORD=devdb1234  --network ebay-network mongo
+```
 
 Docker Volumes
 Volumes are stored in a part of the host filesystem which is managed by Docker service (/var/lib/docker/volumes/ on Linux).
@@ -40,18 +42,20 @@ Non-Docker processes should not modify this part of the filesystem. Volumes are 
 
      docker volume create DBbackup
 	 # To list volumes
+  ```
 	 docker volume ls
-   
+   ```
 6) Use above volume while creating container. Remove containers previously created
 =========================================
  Create a mongo contianer without volume in above network
+```
 	 	 
 	 docker run -d --name mongo -v DBbackup:/data/db   -e MONGO_INITDB_ROOT_USERNAME=devdb -e MONGO_INITDB_ROOT_PASSWORD=devdb1234  --network ebay-network mongo
-
+```
  Create Spring Application Container in above network & which will talk to mongo data base container
-
+```
        docker run -d -p 8081:8080 --name springapp  -e MONGO_DB_HOSTNAME=mongo -e MONGO_DB_USERNAME=devdb -e MONGO_DB_PASSWORD=devdb1234 --network ebay-network mylandmarktech/myapp:6
-       
+```       
   	 
    
 7) Access Spring application & insert data it will be inserted to mongodb. Delete and recreate mongo container with the same volume mapping and you can retrieve your data.
@@ -75,8 +79,9 @@ By default volumes are mounted as Read/Write
 We can map Volumes As Read Only using below option
 
    -v <volumeName/BindMount>:<containerPath>:ro
-   
+ ```  
    docker run -d -p 27017:27017 -v ebsvolume:/data/db:ro  --name mongo -e MONGO_INITDB_ROOT_USERNAME=devdb -e MONGO_INITDB_ROOT_PASSWORD=devdb1234  --network ebs-network mongo
+```
  ======================================  
   
   
@@ -97,7 +102,7 @@ An online banking java based web application for BOA or
 
 With docker compose to deploy above applications which has only 2 images we executed below commnads.
 
-
+```
 docker network create -d bridge springappnetwork
 
 docker volume create -d local mongobkp
@@ -105,7 +110,7 @@ docker volume create -d local mongobkp
  docker run -d --name mongo -v mongobkp:/data/db -e MONGO_INITDB_ROOT_USERNAME=devdb -e MONGO_INITDB_ROOT_PASSWORD=devdb1234  --network boa-network mongo
  
  docker run -d -p 8080:8080 --name springapp  -e MONGO_DB_HOSTNAME=mongo -e MONGO_DB_USERNAME=devdb -e MONGO_DB_PASSWORD=devdb1234 --network boa-network mylandmarktech/spring-boot-mongo
- 
+``` 
 
 With Docker Compose we deploy/create all of the above 4 with single command using compose file.
 
@@ -122,7 +127,7 @@ Defautl name : docker-compose.yml or docker-compose.yaml
 
 
 Example 1: (Volumes & Networks also will be created by docker compose)
-
+```
 # docker-compose.yml 
 
 version: '3.1'
@@ -156,7 +161,7 @@ volumes:
 networks:
   wellsfargo:
     driver: bridge
-
+```
 
 Commands
 # Syntax Check
@@ -169,6 +174,7 @@ docker-compose down
 
 Example 2: (Volumes & Networks will not be created by docker compose.As we set volumes and networks as external)
 ==========
+```
 version: '3.1'
 
 services:
@@ -201,7 +207,7 @@ volumes:
 networks:
   wellsfargo:
     external: true
-	
+```	
 If docker compose file with custom name.	
 docker-compose -f <CustomeComposeFileName>.yml <command>
 
