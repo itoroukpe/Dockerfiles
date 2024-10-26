@@ -574,3 +574,262 @@ docker login -u admin -p admin123 172.31.45.81:8083
 docker service create  -p <hostPort>:<containerPort> --name <serviceName> --replicas 1  --with-registry-auth <imageName>
 
 docker stack deploy --compose-file docker-compose.yml  --with-registry-auth <stackName>
+
+
+
+-============================================================
+### Hands-On Guide to Docker Compose: Deploying Multi-Container Applications
+
+Docker Compose is an essential tool for managing and deploying multi-container applications. This guide demonstrates how to use Docker Compose to deploy a basic application with two services, MongoDB and a Spring Boot Java application, which could represent a simplified setup for an e-commerce or banking application.
+
+### Prerequisites
+
+1. **Install Docker Compose**:
+   ```bash
+   sudo apt install docker-compose
+   ```
+
+2. **Set up Docker Network and Volumes (Optional)**: Although Docker Compose can automatically create networks and volumes, you can also create them manually if needed.
+
+### Docker Compose File Structure
+
+Docker Compose files are usually named `docker-compose.yml` or `docker-compose.yaml` by default. Here, we’ll define the services for our application in the Compose file to simplify deployment.
+
+### Docker Compose File (Example 1)
+
+Below is a `docker-compose.yml` example file that will create a Spring Boot app and MongoDB container with an internal network, `wellsfargo`, and a Docker-managed volume `mydatas`.
+
+```yaml
+version: '3.1'
+
+services:
+  app:
+    image: mylandmarktech/myapp:6
+    restart: always
+    environment:
+      - MONGO_DB_HOSTNAME=mongod
+      - MONGO_DB_USERNAME=devdb
+      - MONGO_DB_PASSWORD=devdb123
+    ports:
+      - 8080:8080
+    networks:
+      - wellsfargo
+
+  mongod:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=devdb
+      - MONGO_INITDB_ROOT_PASSWORD=devdb123
+    volumes:
+      - mydatas:/data/db
+    restart: always
+    networks:
+      - wellsfargo
+
+volumes:
+  mydatas:
+    driver: local
+
+networks:
+  wellsfargo:
+    driver: bridge
+```
+
+### Explanation of `docker-compose.yml`
+
+- **Services**:
+  - `app`: The Spring Boot application configured to connect to MongoDB using environment variables.
+  - `mongod`: The MongoDB service with persistent data storage in the `mydatas` volume.
+  
+- **Volumes**: Docker-managed volume `mydatas` is used for persisting MongoDB data.
+- **Networks**: A custom bridge network `wellsfargo` enables internal communication between `app` and `mongod`.
+
+### Running Docker Compose Commands
+
+1. **Validate the Compose File**:
+   ```bash
+   docker-compose config
+   ```
+
+2. **Start the Services**:
+   ```bash
+   docker-compose up -d
+   ```
+
+   This command creates and starts the containers in detached mode.
+
+3. **Check Running Containers**:
+   ```bash
+   docker-compose ps
+   ```
+
+4. **View Logs**:
+   ```bash
+   docker-compose logs -f
+   ```
+
+5. **Stop and Remove Services**:
+   ```bash
+   docker-compose down
+   ```
+
+### Docker Compose File (Example 2 - External Networks and Volumes)
+
+If you have pre-existing Docker networks and volumes, you can set them as external in your `docker-compose.yml`. Here’s how:
+
+```yaml
+version: '3.1'
+
+services:
+  app:
+    image: mylandmarktech/myapp:6
+    restart: always
+    environment:
+      - MONGO_DB_HOSTNAME=mongod
+      - MONGO_DB_USERNAME=devdb
+      - MONGO_DB_PASSWORD=devdb123
+    ports:
+      - 8080:8080
+    networks:
+      - wellsfargo
+
+  mongod:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=devdb
+      - MONGO_INITDB_ROOT_PASSWORD=devdb123
+    volumes:
+      - mydatas:/data/db
+    restart: always
+    networks:
+      - wellsfargo
+
+volumes:
+  mydatas:
+    external: true
+
+networks:
+  wellsfargo:
+    external: true
+```
+
+In this setup:
+- **Volumes** and **Networks** are marked as external, indicating that Docker Compose will use pre-existing resources rather than creating new ones.
+
+### Custom Compose File Name
+
+If you choose to use a custom file name, for example, `docker-compose-springapp.yml`, use the `-f` flag with each command:
+
+```bash
+docker-compose -f docker-compose-springapp.yml config
+docker-compose -f docker-compose-springapp.yml up -d
+docker-compose -f docker-compose-springapp.yml down
+```
+
+### Key Docker Compose Commands
+
+| Command                          | Description                                                                 |
+|----------------------------------|-----------------------------------------------------------------------------|
+| `docker-compose config`          | Validate and view the Compose file.                                         |
+| `docker-compose up -d`           | Create and start all services in detached mode.                             |
+| `docker-compose down`            | Stop and remove containers, networks, images, and volumes.                  |
+| `docker-compose logs -f`         | View and follow logs from containers.                                       |
+| `docker-compose ps`              | List containers associated with the Compose setup.                          |
+| `docker-compose start`           | Start services defined in the Compose file.                                 |
+| `docker-compose stop`            | Stop services without removing containers.                                  |
+| `docker-compose restart`         | Restart all containers.                                                     |
+| `docker-compose exec [service]`  | Execute a command in a running container.                                   |
+
+### Conclusion
+
+With Docker Compose, deploying a multi-container application is streamlined, allowing you to define and manage multiple services in a single configuration file. Docker Compose handles the creation of networks, volumes, and environment configurations, making it an ideal choice for deploying complex applications with multiple interdependent microservices.
+
+
+=============================================================================
+### Docker Hands-On Practical: Persisting Data with Docker Network, Volumes, and Containers
+
+In this practical, we'll set up a Docker network, MongoDB, and a Spring Boot application to interact with the MongoDB container. We'll start without data persistence and then switch to using Docker volumes for data retention.
+
+#### Step 1: Create a Docker Network
+
+First, create a Docker network to ensure our containers can communicate with each other.
+
+```bash
+docker network create -d bridge ebay-network
+```
+
+#### Step 2: Run a MongoDB Container Without Volume
+
+Launch a MongoDB container without volume in the newly created network, `ebay-network`.
+
+```bash
+docker run -d --name mongo -e MONGO_INITDB_ROOT_USERNAME=devdb -e MONGO_INITDB_ROOT_PASSWORD=devdb1234 --network ebay-network mongo
+```
+
+This container will not retain any data if deleted.
+
+#### Step 3: Run the Spring Boot Application Container in the Same Network
+
+Now, launch the Spring application container in `ebay-network`, which will communicate with the MongoDB container.
+
+```bash
+docker run -d -p 8081:8080 --name springapp -e MONGO_DB_HOSTNAME=mongo -e MONGO_DB_USERNAME=devdb -e MONGO_DB_PASSWORD=devdb1234 --network ebay-network mylandmarktech/myapp:6
+```
+
+Access the Spring application at `http://localhost:8081` and insert data. This data will be stored in MongoDB.
+
+#### Step 4: Verify Data Persistence (Without Volume)
+
+If you delete the MongoDB container and recreate it, the data you previously added will no longer be available because it was stored within the container itself.
+
+```bash
+docker rm -f mongo
+docker run -d --name mongo -e MONGO_INITDB_ROOT_USERNAME=devdb -e MONGO_INITDB_ROOT_PASSWORD=devdb1234 --network ebay-network mongo
+```
+
+#### Step 5: Setting Up Data Persistence with Docker Volumes
+
+To persist data, we'll use Docker volumes. Volumes can be either **bind mounts** (linking a specific directory on the host) or **Docker-managed volumes**. Let's explore both.
+
+##### Option A: Bind Mount
+
+1. **Create a Bind Mount Directory** on the host:
+   ```bash
+   mkdir data
+   ```
+   
+2. **Launch MongoDB Container with Bind Mount**:
+   ```bash
+   docker run -d --name mongo -v $(pwd)/data:/data/db -e MONGO_INITDB_ROOT_USERNAME=devdb -e MONGO_INITDB_ROOT_PASSWORD=devdb1234 --network ebay-network mongo
+   ```
+
+##### Option B: Docker-Managed Volume
+
+1. **Create a Docker Volume**:
+   ```bash
+   docker volume create DBbackup
+   ```
+
+2. **Run MongoDB Container Using Docker Volume**:
+   ```bash
+   docker run -d --name mongo -v DBbackup:/data/db -e MONGO_INITDB_ROOT_USERNAME=devdb -e MONGO_INITDB_ROOT_PASSWORD=devdb1234 --network ebay-network mongo
+   ```
+
+3. **List Existing Volumes**:
+   ```bash
+   docker volume ls
+   ```
+
+#### Step 6: Reconnect Spring Application with MongoDB
+
+After setting up a persistent MongoDB container, relaunch the Spring application container in the same network:
+
+```bash
+docker run -d -p 8081:8080 --name springapp -e MONGO_DB_HOSTNAME=mongo -e MONGO_DB_USERNAME=devdb -e MONGO_DB_PASSWORD=devdb1234 --network ebay-network mylandmarktech/myapp:6
+```
+
+Now, any data you insert via the Spring application will persist even if the MongoDB container is deleted and recreated, as long as the volume is re-attached.
+
+#### Conclusion
+
+Using Docker networks and volumes, we have configured a system where data persists across container restarts and deletions, promoting a reliable and sustainable application environment. Volumes provide a simple and effective way to handle data storage, essential for any data-driven applications running on Docker.
