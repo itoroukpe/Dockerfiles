@@ -29,5 +29,5 @@ volumes:
     driver: local
 networks:
   wellsfargo:
-    driver: bridge![image](https://github.com/itoroukpe/Dockerfiles/assets/122684000/b90b628b-0606-4f84-b3d4-987eb28b63bd)
+    driver: bridge
 ```
